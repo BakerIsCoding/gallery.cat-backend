@@ -1,0 +1,12 @@
+/.idea/
+/.vscode
+/node_modules/
+/.env
+package-lock.json
+/package-lock.json
+/dist
+/logs
+/tmp
+.php-ini
+.php-version
+certs/
