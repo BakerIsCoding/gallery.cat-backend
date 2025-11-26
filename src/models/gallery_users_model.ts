@@ -9,12 +9,40 @@ import {
   Default,
   Unique,
 } from "sequelize-typescript";
+import { Optional } from "sequelize";
+
+interface GalleryUserAttributes {
+  userId: number;
+  username: string;
+  email: string;
+  password?: string | null;
+  mailToken?: string | null;
+  isMailConfirmed: boolean;
+  role: number;
+  createdAt?: Date | null;
+  updatedAt?: Date | null;
+  imageUrl?: string | null;
+}
+
+type GalleryUserCreationAttributes = Optional<
+  GalleryUserAttributes,
+  | "userId"
+  | "mailToken"
+  | "isMailConfirmed"
+  | "role"
+  | "createdAt"
+  | "updatedAt"
+  | "imageUrl"
+>;
 
 @Table({
   tableName: "gallery_users",
   timestamps: false,
 })
-export class gallery_users extends Model<gallery_users> {
+export class gallery_users
+  extends Model<GalleryUserAttributes, GalleryUserCreationAttributes>
+  implements GalleryUserAttributes
+{
   @PrimaryKey
   @AutoIncrement
   @Column({ type: DataType.INTEGER })
@@ -31,7 +59,7 @@ export class gallery_users extends Model<gallery_users> {
 
   @AllowNull
   @Column({ type: DataType.TEXT })
-  password?: string;
+  password?: string | null;
 
   @AllowNull
   @Column({ type: DataType.TEXT })

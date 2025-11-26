@@ -129,4 +129,20 @@ export default class EncriptionUtils {
     if (pad !== 4) str += "=".repeat(pad);
     return Buffer.from(str, "base64");
   }
+
+  public generateRegistrationToken(): string {
+    const VALID_CHARACTERS =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    const length = 48;
+
+    const bytes = randomBytes(length);
+    let token = "";
+
+    for (let i = 0; i < length; i++) {
+      const index = bytes[i] % VALID_CHARACTERS.length;
+      token += VALID_CHARACTERS[index];
+    }
+
+    return token;
+  }
 }
