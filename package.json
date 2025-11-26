@@ -8,7 +8,8 @@
     "files": "bash ./scripts/copy-files.sh",
     "dev": "cross-env TZ=UTC USE_LOCAL_PATH=true nodemon --exec ts-node -r tsconfig-paths/register index.ts",
     "start": "cross-env TZ=UTC node dist/backend/index.js",
-    "test": "cross-env TZ=UTC node --watch index.ts"
+    "test": "cross-env TZ=UTC jest",
+    "test:watch": "cross-env TZ=UTC jest --watch"
   },
   "repository": {
     "type": "git",
@@ -28,6 +29,7 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/express-fileupload": "^1.5.0",
+    "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20.17.9",
     "@types/nodemailer": "^6.4.15",
@@ -35,8 +37,10 @@
     "cross-env": "^7.0.3",
     "dotenv": "^16.6.1",
     "express": "^4.18.2",
+    "jest": "^30.2.0",
     "mysql": "^2.18.1",
     "nodemon": "^3.0.1",
+    "ts-jest": "^29.4.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3"
   },

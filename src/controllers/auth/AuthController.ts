@@ -10,6 +10,8 @@ import { TooManyRequestsResponse } from "src/dto/common/TooManyRequestsResponse"
 import { InternalServerErrorResponse } from "src/dto/common/InternalServerErrorResponse";
 import EncriptionUtils from "@utils/EncryptionUtils";
 import gallery_users from "@models/gallery_users_model";
+import { RegisterResponseDto } from "src/dto/auth/RegisterResponseDto";
+import { RegisterBodyDto } from "src/dto/auth/RegisterBodyDto";
 
 @Service()
 @JsonController("/v1/auth")
@@ -81,6 +83,56 @@ export class AuthController {
       type: ResponseType.SUCCESS,
       msg: "Successful login",
       data: { token: accessToken },
+    };
+  }
+
+  @Post("/register")
+  @HttpCode(200)
+  @OpenAPI({
+    summary: "Register",
+    description: "Returns success upon successful registration",
+    security: [],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: { $ref: "#/components/schemas/RegisterBodyDto" },
+          example: {
+            username: "newuser",
+            email: "valid@mail.com",
+            password: "superdupermegaultrasecurep@ssword",
+          },
+        },
+      },
+    },
+  })
+  @ResponseSchema(RegisterResponseDto, { statusCode: 200 })
+  @ResponseSchema(TooManyRequestsResponse, { statusCode: 429 })
+  @ResponseSchema(InternalServerErrorResponse, { statusCode: 500 })
+  public async register(
+    @Body({ validate: true }) body: RegisterBodyDto
+  ): Promise<RegisterResponseDto> {
+    const { username, email, password } = body;
+
+    if (!username || !email || !password) {
+      return {
+        type: ResponseType.ERROR,
+        msg: "Username, email and password are required",
+      };
+    }
+
+    const user = await this.authService.registerUser(username, email, password);
+
+    if (!user.success) {
+      return {
+        type: ResponseType.ERROR,
+        msg: user.message,
+      };
+    }
+
+    return {
+      type: ResponseType.SUCCESS,
+      msg: "Successful registration",
     };
   }
 
