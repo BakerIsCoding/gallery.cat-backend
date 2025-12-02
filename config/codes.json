@@ -1,0 +1,127 @@
+{
+  "10000": {
+    "es": "Operación realizada correctamente",
+    "en": "Operation completed successfully",
+    "ca": "Operació completada correctament"
+  },
+  "10001": {
+    "es": "",
+    "en": "Login successful",
+    "ca": ""
+  },
+  "10002": {
+    "es": "",
+    "en": "Register successful",
+    "ca": ""
+  },
+  "10011": {
+    "es": "",
+    "en": "Posts retrieved successfully",
+    "ca": ""
+  },
+  "10012": {
+    "es": "",
+    "en": "Post created successfully",
+    "ca": ""
+  },
+  "10013": {
+    "es": "",
+    "en": "Post deleted successfully",
+    "ca": ""
+  },
+  "50000": {
+    "es": "Ha ocurrido un error",
+    "en": "An error has occurred",
+    "ca": "S'ha produït un error"
+  },
+  "50001": {
+    "es": "",
+    "en": "Mail and password are required",
+    "ca": ""
+  },
+  "50002": {
+    "es": "",
+    "en": "Invalid credentials",
+    "ca": ""
+  },
+  "50003": {
+    "es": "",
+    "en": "Something went wrong while encrypting userId",
+    "ca": ""
+  },
+  "50004": {
+    "es": "",
+    "en": "Username, email and password are required",
+    "ca": ""
+  },
+  "50005": {
+    "es": "",
+    "en": "Username is required",
+    "ca": ""
+  },
+  "50006": {
+    "es": "",
+    "en": "Username must be between 3 and 32 characters long",
+    "ca": ""
+  },
+  "50007": {
+    "es": "",
+    "en": "Username contains invalid characters",
+    "ca": ""
+  },
+  "50008": {
+    "es": "",
+    "en": "Username cannot be only whitespace",
+    "ca": ""
+  },
+  "50009": {
+    "es": "",
+    "en": "Username is already taken",
+    "ca": ""
+  },
+  "50010": {
+    "es": "",
+    "en": "Email is required",
+    "ca": ""
+  },
+  "50011": {
+    "es": "",
+    "en": "Invalid email format",
+    "ca": ""
+  },
+  "50012": {
+    "es": "",
+    "en": "Email contains invalid characters",
+    "ca": ""
+  },
+  "50013": {
+    "es": "",
+    "en": "Email is already registered",
+    "ca": ""
+  },
+  "50021": {
+    "es": "",
+    "en": "Error retrieving posts",
+    "ca": ""
+  },
+  "50022": {
+    "es": "",
+    "en": "Error creating post",
+    "ca": ""
+  },
+  "50023": {
+    "es": "",
+    "en": "Error deleting post",
+    "ca": ""
+  },
+  "50024": {
+    "es": "",
+    "en": "You are not authorized to edit this post",
+    "ca": ""
+  },
+  "50025": {
+    "es": "",
+    "en": "You are not authorized to delete this post",
+    "ca": ""
+  }
+}

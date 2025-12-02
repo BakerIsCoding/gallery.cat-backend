@@ -17,58 +17,63 @@ export class PostService {
   public async getAllPostsByPage(
     page: number,
     pageSize: number
-  ): Promise<{ items: PostDto[]; count: number; code?: number }> {
-    const limit = pageSize;
-    const offset = (page - 1) * pageSize;
+  ): Promise<{ items: PostDto[]; count: number; code: number }> {
+    try {
+      const limit = pageSize;
+      const offset = (page - 1) * pageSize;
 
-    const { rows, count } = await gallery_posts.findAndCountAll({
-      limit,
-      offset,
-      order: [["createdAt", "DESC"]],
-      include: [
-        { model: gallery_users, as: "user" },
-        { model: gallery_post_likes, as: "likes" },
-        { model: gallery_post_comments, as: "comments" },
-      ],
-    });
-
-    if (!rows) {
-      return { items: [], count: 0, code: 1000 };
-    }
-
-    const items: PostDto[] = [];
-
-    for (const post of rows) {
-      const author = post.user;
-      const likes = post.likes ?? [];
-      const comments = post.comments ?? [];
-
-      const likeCount = likes.length;
-      const commentCount = comments.length;
-
-      items.push({
-        postId: post.postId,
-        userId: post.userId,
-        description: post.description,
-        imageUrl: post.imageUrl,
-        createdAt: post.createdAt ? post.createdAt.toISOString() : null,
-        updatedAt: post.updatedAt ? post.updatedAt.toISOString() : null,
-        likeCount,
-        commentCount,
-        author: {
-          userId: author?.userId ?? post.userId,
-          username: author?.username ?? "",
-          imageUrl: author?.imageUrl ?? null,
-        },
+      const { rows, count } = await gallery_posts.findAndCountAll({
+        limit,
+        offset,
+        order: [["createdAt", "DESC"]],
+        include: [
+          { model: gallery_users, as: "user" },
+          { model: gallery_post_likes, as: "likes" },
+          { model: gallery_post_comments, as: "comments" },
+        ],
       });
-    }
 
-    return { items, count };
+      if (!rows) {
+        return { items: [], count: 0, code: 10000 };
+      }
+
+      const items: PostDto[] = [];
+
+      for (const post of rows) {
+        const author = post.user;
+        const likes = post.likes ?? [];
+        const comments = post.comments ?? [];
+
+        const likeCount = likes.length;
+        const commentCount = comments.length;
+
+        items.push({
+          postId: post.postId,
+          userId: post.userId,
+          description: post.description,
+          imageUrl: post.imageUrl,
+          createdAt: post.createdAt ? post.createdAt.toISOString() : null,
+          updatedAt: post.updatedAt ? post.updatedAt.toISOString() : null,
+          likeCount,
+          commentCount,
+          author: {
+            userId: author?.userId ?? post.userId,
+            username: author?.username ?? "",
+            imageUrl: author?.imageUrl ?? null,
+          },
+        });
+      }
+
+      return { items, count, code: 10011 };
+    } catch (error) {
+      //TODO: LOG ERROR
+      return { items: [], count: 0, code: 50021 };
+    }
   }
 
   public async getPostById(
     postId: number
-  ): Promise<{ responsePost: PostDto | null; code?: number }> {
+  ): Promise<{ responsePost: PostDto | null; code: number }> {
     try {
       const post = await gallery_posts.findByPk(postId, {
         include: [
@@ -81,7 +86,7 @@ export class PostService {
       if (!post) {
         return {
           responsePost: null,
-          code: 1001,
+          code: 50021,
         };
       }
 
@@ -108,23 +113,24 @@ export class PostService {
         },
       };
 
-      return { responsePost };
+      return { responsePost, code: 10000 };
     } catch (error) {
-      return { responsePost: null, code: 1000 };
+      //TODO: LOG ERROR
+      return { responsePost: null, code: 50021 };
     }
   }
 
   public async createPost(
     user: JwtPayload,
     body: CreatePostBodyDto
-  ): Promise<{ success: boolean; code?: number }> {
+  ): Promise<{ success: boolean; code: number }> {
     try {
       const decryptionUtils = EncriptionUtils.getInstance();
       const decryptedUserId = decryptionUtils.jwtDecryptValue(user.userId);
       const userId = Number(decryptedUserId);
 
       if (!userId || Number.isNaN(userId)) {
-        return { success: false, code: 2001 };
+        return { success: false, code: 50022 };
       }
 
       const created = await gallery_posts.create({
@@ -136,45 +142,47 @@ export class PostService {
       });
 
       if (!created) {
-        return { success: false, code: 2002 };
+        return { success: false, code: 50022 };
       }
 
-      return { success: true };
+      return { success: true, code: 10012 };
     } catch (error) {
+      //TODO: LOG ERROR
       console.error("Error creating post (service):", error);
-      return { success: false, code: 1000 };
+      return { success: false, code: 50022 };
     }
   }
 
   public async deletePost(
     user: JwtPayload,
     postId: number
-  ): Promise<{ success: boolean; code?: number }> {
+  ): Promise<{ success: boolean; code: number }> {
     try {
       const decryptionUtils = EncriptionUtils.getInstance();
       const decryptedUserId = decryptionUtils.jwtDecryptValue(user.userId);
       const userId = Number(decryptedUserId);
 
       if (!userId || Number.isNaN(userId)) {
-        return { success: false, code: 2001 };
+        return { success: false, code: 50023 };
       }
 
       const post = await gallery_posts.findByPk(postId);
 
       if (!post) {
-        return { success: false, code: 2003 };
+        return { success: false, code: 50023 };
       }
 
       if (post.userId !== userId) {
-        return { success: false, code: 2004 };
+        return { success: false, code: 50025 };
       }
 
       await post.destroy();
 
-      return { success: true };
+      return { success: true, code: 10013 };
     } catch (error) {
+      //TODO: LOG ERROR
       console.error("Error deleting post (service):", error);
-      return { success: false, code: 1000 };
+      return { success: false, code: 50023 };
     }
   }
 }

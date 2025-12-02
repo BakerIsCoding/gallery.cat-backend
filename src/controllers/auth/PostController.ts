@@ -69,10 +69,10 @@ export class PostsController {
       const allPosts = await this.postService.getAllPostsByPage(page, pageSize);
 
       if (allPosts.code) {
-        //TODO: Add Error codes
         return {
           type: ResponseType.ERROR,
           msg: "Error retrieving posts",
+          code: allPosts.code,
         };
       }
 
@@ -85,12 +85,14 @@ export class PostsController {
           page,
           pageSize,
         },
+        code: allPosts.code,
       };
     } catch (error) {
       console.error("Error listing posts:", error);
       return {
         type: ResponseType.ERROR,
         msg: "Error listing posts",
+        code: 50000,
       };
     }
   }
@@ -122,6 +124,7 @@ export class PostsController {
         return {
           type: ResponseType.ERROR,
           msg: "Post not found",
+          code: responsePost.code,
         };
       }
 
@@ -131,12 +134,14 @@ export class PostsController {
         data: {
           post: responsePost.responsePost,
         },
+        code: responsePost.code,
       };
     } catch (error) {
       console.error("Error getting post:", error);
       return {
         type: ResponseType.ERROR,
         msg: "Error getting post",
+        code: 50000,
       };
     }
   }
@@ -172,18 +177,21 @@ export class PostsController {
         return {
           type: ResponseType.ERROR,
           msg: "Error creating post",
+          code: result.code,
         };
       }
 
       return {
         type: ResponseType.SUCCESS,
         msg: "Post created successfully",
+        code: result.code,
       };
     } catch (error) {
       console.error("Error creating post (controller):", error);
       return {
         type: ResponseType.ERROR,
         msg: "Error creating post",
+        code: 50000,
       };
     }
   }
@@ -217,18 +225,21 @@ export class PostsController {
         return {
           type: ResponseType.ERROR,
           msg: "Error deleting post",
+          code: result.code,
         };
       }
 
       return {
         type: ResponseType.SUCCESS,
         msg: "Post deleted successfully",
+        code: result.code,
       };
     } catch (error) {
       console.error("Error deleting post (controller):", error);
       return {
         type: ResponseType.ERROR,
         msg: "Error deleting post",
+        code: 50000,
       };
     }
   }

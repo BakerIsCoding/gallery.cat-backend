@@ -1,4 +1,4 @@
-import { IsEnum, IsString } from "class-validator";
+import { IsEnum, IsNumber, IsString, Max, Min } from "class-validator";
 
 export enum ResponseType {
   SUCCESS = "success",
@@ -11,4 +11,9 @@ export class BaseResponseDto {
 
   @IsString()
   msg!: string;
+
+  @IsNumber()
+  @Min(10000)
+  @Max(99999)
+  code!: number;
 }

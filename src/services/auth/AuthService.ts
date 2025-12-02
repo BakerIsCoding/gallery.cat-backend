@@ -42,15 +42,24 @@ export class AuthService {
     message: string;
     id?: number;
     role?: number;
+    code: number;
   }> {
     const isUsernameValid = await this.validateUsername(username);
     if (!isUsernameValid.success) {
-      return { success: false, message: isUsernameValid.message };
+      return {
+        success: false,
+        message: isUsernameValid.message,
+        code: isUsernameValid.code,
+      };
     }
 
     const isEmailValid = await this.validateEmail(email);
     if (!isEmailValid.success) {
-      return { success: false, message: isEmailValid.message };
+      return {
+        success: false,
+        message: isEmailValid.message,
+        code: isEmailValid.code,
+      };
     }
 
     const isPasswordValid = await this.isPasswordValid(password);
@@ -58,6 +67,7 @@ export class AuthService {
       return {
         success: false,
         message: "Password does not meet security criteria",
+        code: 50002,
       };
     }
 
@@ -78,7 +88,7 @@ export class AuthService {
     });
 
     if (!newUser) {
-      return { success: false, message: "Failed to create user" };
+      return { success: false, message: "Failed to create user", code: 50000 };
     }
 
     return {
@@ -86,6 +96,7 @@ export class AuthService {
       message: "User registered successfully",
       id: newUser.userId,
       role: newUser.role,
+      code: 10000,
     };
   }
 
@@ -117,9 +128,9 @@ export class AuthService {
 
   private async validateUsername(
     username: string
-  ): Promise<{ success: boolean; message: string }> {
+  ): Promise<{ success: boolean; message: string; code: number }> {
     if (!username) {
-      return { success: false, message: "Username is required" };
+      return { success: false, message: "Username is required", code: 50006 };
     }
 
     username = username.trim();
@@ -128,6 +139,7 @@ export class AuthService {
       return {
         success: false,
         message: "Username must be between 3 and 32 characters",
+        code: 50006,
       };
     }
 
@@ -135,7 +147,8 @@ export class AuthService {
     if (/[\x00-\x1F\x7F]/.test(username)) {
       return {
         success: false,
-        message: "Username contains invalid control characters",
+        message: "Username contains invalid characters",
+        code: 50007,
       };
     }
 
@@ -144,6 +157,7 @@ export class AuthService {
       return {
         success: false,
         message: "Username cannot be only whitespace",
+        code: 50008,
       };
     }
 
@@ -154,17 +168,21 @@ export class AuthService {
     });
 
     if (obtainedUser) {
-      return { success: false, message: "Username is already taken" };
+      return {
+        success: false,
+        message: "Username is already taken",
+        code: 50009,
+      };
     }
 
-    return { success: true, message: "Username is valid" };
+    return { success: true, message: "Username is valid", code: 10000 };
   }
 
   private async validateEmail(
     email: string
-  ): Promise<{ success: boolean; message: string }> {
+  ): Promise<{ success: boolean; message: string; code: number }> {
     if (!email) {
-      return { success: false, message: "Email is required" };
+      return { success: false, message: "Email is required", code: 50010 };
     }
 
     email = email.trim().toLowerCase();
@@ -176,6 +194,7 @@ export class AuthService {
       return {
         success: false,
         message: "Invalid email format",
+        code: 50011,
       };
     }
 
@@ -184,6 +203,7 @@ export class AuthService {
       return {
         success: false,
         message: "Email contains invalid characters",
+        code: 50012,
       };
     }
 
@@ -198,10 +218,11 @@ export class AuthService {
       return {
         success: false,
         message: "Email is already registered",
+        code: 50013,
       };
     }
 
-    return { success: true, message: "Email is valid" };
+    return { success: true, message: "Email is valid", code: 10000 };
   }
 
   private escapeString(str: string): string {
