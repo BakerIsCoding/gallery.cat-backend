@@ -1,9 +1,11 @@
 import { Response, NextFunction } from "express";
 import { AuthService } from "@services/auth/AuthService";
 import { RequestWithUser } from "@interfaces/request";
-import { UserRole } from "@interfaces/auth";
+import { JwtPayload, UserRole } from "@interfaces/auth";
 import EncriptionUtils from "@utils/EncryptionUtils";
-
+import { Action } from "routing-controllers";
+import { Service } from "typedi";
+@Service()
 export class AuthMiddleware {
   constructor(private readonly authService: AuthService) {}
 
@@ -46,12 +48,64 @@ export class AuthMiddleware {
     };
   };
 
+  public async authorizationChecker(
+    action: Action,
+    roles: UserRole[]
+  ): Promise<boolean> {
+    const req = action.request as any;
+
+    const header: string | undefined =
+      req.header?.("authorization") || req.headers["authorization"];
+
+    if (!header) {
+      return false;
+    }
+
+    const [scheme, token] = header.split(" ");
+
+    if (scheme !== "Bearer" || !token) {
+      return false;
+    }
+
+    try {
+      const utils = EncriptionUtils.getInstance();
+
+      const payload = this.authService.verifyAccessToken(token) as JwtPayload;
+
+      req.user = payload;
+
+      // If there are no roles, you need to be authenticated
+      if (!roles || roles.length === 0) {
+        return false;
+      }
+
+      // If there are roles
+      const decryptedRoleStr = utils.jwtDecryptValue(payload.role);
+      const decryptedRole = Number(decryptedRoleStr) as UserRole;
+
+      return roles.includes(decryptedRole);
+    } catch (err) {
+      console.error("Error verifying access token:", err);
+      return false;
+    }
+  }
+
+  public async currentUserChecker(
+    action: Action
+  ): Promise<JwtPayload | undefined> {
+    return action.request.user as JwtPayload | undefined;
+  }
+
   private toUserRole(value: unknown): UserRole | null {
-    if (typeof value !== "number" || typeof value !== "string") return null;
-    return value === UserRole.USER ||
-      value === UserRole.ADMIN ||
-      value === UserRole.SUPER_ADMIN
-      ? (value as UserRole)
+    if (typeof value !== "number" && typeof value !== "string") return null;
+
+    const num =
+      typeof value === "number" ? value : Number.parseInt(value as string, 10);
+
+    return num === UserRole.USER ||
+      num === UserRole.ADMIN ||
+      num === UserRole.SUPER_ADMIN
+      ? (num as UserRole)
       : null;
   }
 }
