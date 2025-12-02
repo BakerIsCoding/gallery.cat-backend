@@ -25,8 +25,10 @@ type GalleryPostLikeCreationAttributes = Optional<
   "likeId"
 >;
 
+export const TABLE_NAME = "gallery_post_likes";
+
 @Table({
-  tableName: "gallery_post_likes",
+  tableName: TABLE_NAME,
   timestamps: false,
 })
 export class gallery_post_likes

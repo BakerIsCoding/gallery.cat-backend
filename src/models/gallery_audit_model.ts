@@ -10,14 +10,15 @@ import {
   Default,
 } from "sequelize-typescript";
 import { Optional } from "sequelize";
+import { AuditTable, AuditType } from "@interfaces/auditInterfaces";
 
 interface AuditAttributes {
   id: number;
-  table: string;
+  table: AuditTable;
   userId: number | null;
   oldData?: object | null;
   newData?: object | null;
-  queryType: "INSERT" | "UPDATE" | "DELETE" | string;
+  queryType: AuditType;
   date: Date;
 }
 
@@ -26,8 +27,10 @@ type AuditCreationAttributes = Optional<
   "id" | "userId" | "oldData" | "newData"
 >;
 
+export const TABLE_NAME = "gallery_audit";
+
 @Table({
-  tableName: "gallery_audit",
+  tableName: TABLE_NAME,
   timestamps: false,
 })
 export class gallery_audit
@@ -42,7 +45,7 @@ export class gallery_audit
   @AllowNull(false)
   @Index
   @Column({ type: DataType.STRING })
-  table!: string;
+  table!: AuditTable;
 
   @AllowNull
   @Index
@@ -59,7 +62,7 @@ export class gallery_audit
 
   @AllowNull(false)
   @Column({ type: DataType.STRING })
-  queryType!: "INSERT" | "UPDATE" | "DELETE";
+  queryType!: AuditType;
 
   @AllowNull(false)
   @Default(DataType.NOW)
