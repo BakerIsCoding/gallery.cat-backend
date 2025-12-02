@@ -49,6 +49,7 @@ export class AuthController {
       return {
         type: ResponseType.ERROR,
         msg: "Mail and password are required",
+        code: 50001,
       };
     }
 
@@ -57,6 +58,7 @@ export class AuthController {
       return {
         type: ResponseType.ERROR,
         msg: "Invalid credentials",
+        code: 50002,
       };
     }
     const encryptionUtils = EncriptionUtils.getInstance();
@@ -69,6 +71,7 @@ export class AuthController {
       return {
         type: ResponseType.ERROR,
         msg: "Something went wrong while encrypting userId",
+        code: 50003,
       };
     }
 
@@ -83,6 +86,7 @@ export class AuthController {
       type: ResponseType.SUCCESS,
       msg: "Successful login",
       data: { token: accessToken },
+      code: 10001,
     };
   }
 
@@ -118,6 +122,7 @@ export class AuthController {
       return {
         type: ResponseType.ERROR,
         msg: "Username, email and password are required",
+        code: 50004,
       };
     }
 
@@ -127,12 +132,14 @@ export class AuthController {
       return {
         type: ResponseType.ERROR,
         msg: user.message,
+        code: user.code,
       };
     }
 
     return {
       type: ResponseType.SUCCESS,
-      msg: "Successful registration",
+      msg: "Register successful",
+      code: 10002,
     };
   }
 

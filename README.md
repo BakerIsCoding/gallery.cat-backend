@@ -1,14 +1,28 @@
-# API
+# 🔐 Codes
 
-gallery.cat api
+## 🟦 General
 
-TODO:
-Crear login con bearer token
+| Type                      | Range     |
+| ------------------------- | --------- |
+| General — Generic Success | **10000** |
+| General — Generic Error   | **50000** |
 
-Crear endpoints:
-para recuperar todos los gatos
-para recuperar fotos de un gato
-para recuperar comentarios
+### ✔️ Successful
 
-Hacer ratelimit de peticiones
-Crear sistema de cuentas y roles
+| Function | Range             |
+| -------- | ----------------- |
+| Auth     | **10001 – 10010** |
+| Posts    | **10011 – 100XX** |
+
+### ❌ Error
+
+| Function | Range             |
+| -------- | ----------------- |
+| Auth     | **50001 – 50020** |
+| Posts    | **50021 – 500XX** |
+
+---
+
+## 📌 Notes
+
+- Messages are available in multiple languages: **es**, **en**, **ca**.
