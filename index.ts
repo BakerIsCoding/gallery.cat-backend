@@ -5,6 +5,7 @@ import "reflect-metadata";
 
 import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 import {
+  Action,
   getMetadataArgsStorage,
   useContainer,
   useExpressServer,
@@ -19,6 +20,9 @@ import Container from "typedi";
 import { GlobalErrorHandler } from "src/middlewares/GlobalErrorHandler";
 import { rateLimiter } from "@config/rateLimiterInstance";
 import Database from "config/db";
+import { PostsController } from "@controllers/auth/PostController";
+import { UserRole } from "@interfaces/auth";
+import { AuthMiddleware } from "src/middlewares/AuthMiddleware";
 
 const app: Express = express();
 
@@ -60,11 +64,23 @@ app.use(rateLimiter.middleware);
 useContainer(Container, { fallback: true });
 useValidatorContainer(Container, { fallback: true, fallbackOnErrors: true });
 
+const authorizationChecker = async (action: Action, roles: UserRole[]) => {
+  const service = Container.get(AuthMiddleware);
+  return service.authorizationChecker(action, roles);
+};
+
+const currentUserChecker = async (action: Action) => {
+  const service = Container.get(AuthMiddleware);
+  return service.currentUserChecker(action);
+};
+
 useExpressServer(app, {
-  controllers: [AuthController],
+  controllers: [AuthController, PostsController],
   validation: true,
   classTransformer: true,
   defaultErrorHandler: false,
+  authorizationChecker: authorizationChecker,
+  currentUserChecker: currentUserChecker,
 });
 
 app.use(GlobalErrorHandler);
@@ -77,7 +93,7 @@ const storage = getMetadataArgsStorage();
 const swaggerSpec = routingControllersToSpec(
   storage,
   {
-    controllers: [AuthController],
+    controllers: [AuthController, PostsController],
     routePrefix: "",
   },
   {
