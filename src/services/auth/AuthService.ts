@@ -4,6 +4,8 @@ import { UserRole, type JwtPayload } from "@interfaces/auth";
 import { Service } from "typedi";
 import gallery_users from "@models/gallery_users_model";
 import EncriptionUtils from "@utils/EncryptionUtils";
+import AuditService from "@services/audit/AuditService";
+import { AuditTable } from "@interfaces/auditInterfaces";
 
 @Service()
 export class AuthService {
@@ -78,18 +80,26 @@ export class AuthService {
     const encryptedPassword = await encryptionUtils.hashSensitive(password);
     const registrationToken = encryptionUtils.generateRegistrationToken();
 
-    const newUser = await gallery_users.create({
+    const userObject = {
       username: escapedUsername,
       email: escapedEmail,
       password: encryptedPassword,
       mailToken: registrationToken,
       isMailConfirmed: false,
       role: UserRole.USER,
-    });
+    };
+
+    const newUser = await gallery_users.create(userObject);
 
     if (!newUser) {
       return { success: false, message: "Failed to create user", code: 50000 };
     }
+
+    AuditService.logInsert({
+      table: AuditTable.USERS,
+      userId: newUser.userId,
+      newData: newUser.toJSON(),
+    });
 
     return {
       success: true,

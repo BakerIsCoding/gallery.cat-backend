@@ -11,6 +11,8 @@ import gallery_post_comments from "@models/gallery_post_comments_model";
 import gallery_posts from "@models/gallery_posts_model";
 import { ResponseType } from "src/dto/common/BaseResponseDto";
 import { CreatePostBodyDto } from "src/dto/post/CreatePostBodyDto";
+import AuditService from "@services/audit/AuditService";
+import { AuditTable } from "@interfaces/auditInterfaces";
 
 @Service()
 export class PostService {
@@ -145,6 +147,12 @@ export class PostService {
         return { success: false, code: 50022 };
       }
 
+      AuditService.logInsert({
+        table: AuditTable.POSTS,
+        userId: userId,
+        newData: created.toJSON(),
+      });
+
       return { success: true, code: 10012 };
     } catch (error) {
       //TODO: LOG ERROR
@@ -177,6 +185,12 @@ export class PostService {
       }
 
       await post.destroy();
+
+      AuditService.logDelete({
+        table: AuditTable.POSTS,
+        userId: userId,
+        oldData: post.toJSON(),
+      });
 
       return { success: true, code: 10013 };
     } catch (error) {

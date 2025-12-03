@@ -31,8 +31,10 @@ type GalleryPostCommentCreationAttributes = Optional<
   "commentId" | "parentCommentId" | "isDeleted" | "updatedAt"
 >;
 
+export const TABLE_NAME = "gallery_post_comments";
+
 @Table({
-  tableName: "gallery_post_comments",
+  tableName: TABLE_NAME,
   timestamps: false,
 })
 export class gallery_post_comments

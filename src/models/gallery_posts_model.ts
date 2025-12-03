@@ -29,8 +29,10 @@ type GalleryPostCreationAttributes = Optional<
   "postId" | "createdAt" | "updatedAt"
 >;
 
+export const TABLE_NAME = "gallery_posts";
+
 @Table({
-  tableName: "gallery_posts",
+  tableName: TABLE_NAME,
   timestamps: false,
 })
 export class gallery_posts

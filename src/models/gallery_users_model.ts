@@ -35,8 +35,10 @@ type GalleryUserCreationAttributes = Optional<
   | "imageUrl"
 >;
 
+export const TABLE_NAME = "gallery_users";
+
 @Table({
-  tableName: "gallery_users",
+  tableName: TABLE_NAME,
   timestamps: false,
 })
 export class gallery_users
