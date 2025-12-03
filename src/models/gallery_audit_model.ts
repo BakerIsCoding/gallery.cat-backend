@@ -12,7 +12,7 @@ import {
 import { Optional } from "sequelize";
 import { AuditTable, AuditType } from "@interfaces/auditInterfaces";
 
-interface AuditAttributes {
+export interface AuditAttributes {
   id: number;
   table: AuditTable;
   userId: number | null;

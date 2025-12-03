@@ -20,7 +20,7 @@ import Container from "typedi";
 import { GlobalErrorHandler } from "src/middlewares/GlobalErrorHandler";
 import { rateLimiter } from "@config/rateLimiterInstance";
 import Database from "config/db";
-import { PostsController } from "@controllers/auth/PostController";
+import { PostsController } from "@controllers/post/PostController";
 import { UserRole } from "@interfaces/auth";
 import { AuthMiddleware } from "src/middlewares/AuthMiddleware";
 

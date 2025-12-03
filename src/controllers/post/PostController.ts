@@ -30,7 +30,7 @@ import { PostListResponseDto } from "src/dto/post/PostListResponseDto";
 import { AuthMiddleware } from "src/middlewares/AuthMiddleware";
 import { AuthService } from "@services/auth/AuthService";
 import EncriptionUtils from "@utils/EncryptionUtils";
-import { PostService } from "@services/auth/PostService";
+import { PostService } from "@services/post/PostService";
 const auth = new AuthMiddleware(new AuthService()).authenticate;
 
 @Service()
