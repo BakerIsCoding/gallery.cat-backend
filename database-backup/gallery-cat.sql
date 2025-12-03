@@ -16,13 +16,13 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `audit`
+-- Table structure for table `gallery_audit`
 --
 
-DROP TABLE IF EXISTS `audit`;
+DROP TABLE IF EXISTS `gallery_audit`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `audit` (
+CREATE TABLE `gallery_audit` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `table` varchar(255) NOT NULL,
   `userId` int unsigned DEFAULT NULL,
@@ -33,7 +33,7 @@ CREATE TABLE `audit` (
   PRIMARY KEY (`id`),
   KEY `idx_audit_table` (`table`),
   KEY `idx_audit_user` (`userId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -124,7 +124,7 @@ CREATE TABLE `gallery_users` (
   PRIMARY KEY (`userId`),
   UNIQUE KEY `ux_gallery_users_email` (`email`),
   KEY `ix_gallery_users_username` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -140,4 +140,4 @@ CREATE TABLE `gallery_users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-03  0:31:56
+-- Dump completed on 2025-12-03 23:32:51
