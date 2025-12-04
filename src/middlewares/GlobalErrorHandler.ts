@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import chalk from "chalk";
 import { saveErrorLog } from "utils/logsUtils";
-import envCfg from "@config/envConfig";
+import envCfg from "@config/envLoader";
 
 export function GlobalErrorHandler(
   error: any,

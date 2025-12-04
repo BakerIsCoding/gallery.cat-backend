@@ -79,8 +79,8 @@ function getRequiredString(value: string | undefined, key: string): string {
   return value;
 }
 
-const envCfg = <K extends keyof EnvConfig>(key: K): EnvConfig[K] => {
+const envLoad = <K extends keyof EnvConfig>(key: K): EnvConfig[K] => {
   return envConfigTyped[key];
 };
 
-export default envCfg;
+export default envLoad;

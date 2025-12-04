@@ -1,4 +1,4 @@
-import envCfg from "@config/envConfig";
+import envCfg from "@config/envLoader";
 import EncriptionUtils from "./EncryptionUtils";
 
 export function getUserIdFromRequest(req: any): number {

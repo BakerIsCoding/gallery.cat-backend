@@ -1,5 +1,5 @@
 // EncriptionUtils.ts
-import envCfg from "@config/envConfig";
+import envCfg from "@config/envLoader";
 import {
   randomBytes,
   createCipheriv,
