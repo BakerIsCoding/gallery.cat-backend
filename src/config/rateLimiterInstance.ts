@@ -1,4 +1,4 @@
-import envCfg from "@config/envConfig";
+import envCfg from "@config/envLoader";
 import { RateLimiter } from "src/middlewares/RateLimiter";
 
 const MAX_REQUESTS = envCfg("RATE_LIMIT_MAX");

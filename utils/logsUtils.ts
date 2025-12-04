@@ -3,7 +3,7 @@ import {
   ForeignKeyConstraintError,
   UniqueConstraintError,
 } from "sequelize";
-import envCfg from "@config/envConfig";
+import envCfg from "@config/envLoader";
 import { log } from "console";
 import * as fs from "fs";
 import * as path from "path";

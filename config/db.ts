@@ -1,5 +1,5 @@
 import { Sequelize } from "sequelize-typescript";
-import envCfg from "@config/envConfig";
+import envCfg from "@config/envLoader";
 import path from "node:path";
 
 export class Database {

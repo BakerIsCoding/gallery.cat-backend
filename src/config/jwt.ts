@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import envCfg from "./envConfig";
+import envCfg from "./envLoader";
 
 export const jwtConfig: {
   accessSecret: string;
