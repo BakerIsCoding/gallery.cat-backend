@@ -6,6 +6,9 @@ import gallery_users from "@models/gallery_users_model";
 import EncriptionUtils from "@utils/EncryptionUtils";
 import AuditService from "@services/audit/AuditService";
 import { AuditTable } from "@interfaces/auditInterfaces";
+import { simpleVerifyTemplate } from "templates/MailVerifyTemplate";
+import { MailService } from "@services/mail/MailService";
+import envLoad from "@config/envLoader";
 
 @Service()
 export class AuthService {
@@ -95,6 +98,22 @@ export class AuthService {
       return { success: false, message: "Failed to create user", code: 50000 };
     }
 
+    const template = simpleVerifyTemplate({
+      username: escapedUsername,
+      verifyUrl: `https://${envLoad(
+        "DOMAIN"
+      )}/v1/auth/verify?token=${registrationToken}`,
+      expiresIn: "15 minutos",
+    });
+
+    const service = new MailService();
+    service.sendMail(
+      escapedEmail,
+      "Verifica tu correo en Gallery.cat",
+      template.html,
+      template.text
+    );
+
     AuditService.logInsert({
       table: AuditTable.USERS,
       userId: newUser.userId,
@@ -108,6 +127,54 @@ export class AuthService {
       role: newUser.role,
       code: 10000,
     };
+  }
+
+  public async verifyUserEmail(mailToken: string): Promise<{
+    success: boolean;
+    message: string;
+    code: number;
+  }> {
+    try {
+      const user = await gallery_users.findOne({ where: { mailToken } });
+
+      if (!user) {
+        return { success: false, message: "Invalid token", code: 500 };
+      }
+
+      if (user.getDataValue("isMailConfirmed")) {
+        return {
+          success: false,
+          message: "Email is already verified",
+          code: 500,
+        };
+      }
+
+      const savedUser = await gallery_users.update(
+        {
+          isMailConfirmed: true,
+        },
+        { where: { mailToken } }
+      );
+
+      if (!savedUser) {
+        return { success: false, message: "Error verifying email", code: 500 };
+      }
+
+      AuditService.logUpdate({
+        table: AuditTable.USERS,
+        userId: user.getDataValue("userId"),
+        oldData: user.toJSON(),
+        newData: { ...user.toJSON(), isMailConfirmed: true },
+      });
+
+      return {
+        success: true,
+        message: "Email verified successfully",
+        code: 10000,
+      };
+    } catch (error) {
+      return { success: false, message: "Error verifying email", code: 500 };
+    }
   }
 
   private async isPasswordValid(password: string): Promise<boolean> {

@@ -1,6 +1,13 @@
 import { AuthService } from "@services/auth/AuthService";
 import { JwtPayload, UserRole, ValidateUserResult } from "@interfaces/auth";
-import { JsonController, Post, Body, HttpCode } from "routing-controllers";
+import {
+  JsonController,
+  Post,
+  Body,
+  HttpCode,
+  Param,
+  QueryParam,
+} from "routing-controllers";
 import { OpenAPI, ResponseSchema } from "routing-controllers-openapi";
 import { LoginResponseDto } from "src/dto/auth/LoginResponseDto";
 import { LoginBodyDto } from "src/dto/auth/LoginBodyDto";
@@ -206,5 +213,52 @@ export class AuthController {
     );
 
     return result;
+  }
+
+  @Post("/verify")
+  @HttpCode(200)
+  @OpenAPI({
+    summary: "Verify Mail",
+    description: "Verifies a user's email using a token",
+    security: [],
+    parameters: [
+      {
+        name: "token",
+        in: "query",
+        required: true,
+        schema: { type: "string" },
+        description: "Verification token sent to the user's email",
+      },
+    ],
+  })
+  @ResponseSchema(RegisterResponseDto, { statusCode: 200 })
+  @ResponseSchema(TooManyRequestsResponse, { statusCode: 429 })
+  @ResponseSchema(InternalServerErrorResponse, { statusCode: 500 })
+  public async verify(
+    @QueryParam("token") token: string
+  ): Promise<RegisterResponseDto> {
+    if (!token) {
+      return {
+        type: ResponseType.ERROR,
+        msg: "Verification token is required",
+        code: 500,
+      };
+    }
+
+    const userVerify = await this.authService.verifyUserEmail(token);
+
+    if (!userVerify.success) {
+      return {
+        type: ResponseType.ERROR,
+        msg: userVerify.message,
+        code: userVerify.code,
+      };
+    }
+
+    return {
+      type: ResponseType.SUCCESS,
+      msg: "Mail validated successfully",
+      code: 10002,
+    };
   }
 }

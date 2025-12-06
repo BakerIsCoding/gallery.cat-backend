@@ -13,7 +13,6 @@ import {
 import { useContainer as useValidatorContainer } from "class-validator";
 import { routingControllersToSpec } from "routing-controllers-openapi";
 import swaggerUi from "swagger-ui-express";
-import envCfg from "@config/envConfig";
 import { AuthController } from "@controllers/auth/AuthController";
 import { ConsolePatcher } from "@utils/ConsoleMethods";
 import Container from "typedi";
@@ -23,6 +22,7 @@ import Database from "config/db";
 import { PostsController } from "@controllers/post/PostController";
 import { UserRole } from "@interfaces/auth";
 import { AuthMiddleware } from "src/middlewares/AuthMiddleware";
+import envLoad from "@config/envLoader";
 
 const app: Express = express();
 
@@ -135,13 +135,12 @@ app.get("/api-docs.json", (_req, res) => res.json(swaggerSpec));
 const httpServer = http.createServer(app);
 
 httpServer
-  .listen(envCfg("PORT") || 5000, () => {
-    console.log("SERVER STARTED", `PORT: ${envCfg("PORT") || 5000}`);
-    //Aquí se pueden añadir más cosas al iniciar el servidor
+  .listen(envLoad("PORT") || 5000, () => {
+    console.log("SERVER STARTED", `PORT: ${envLoad("PORT") || 5000}`);
   })
   .on("error", (err: any) => {
     if (err.code === "EADDRINUSE") {
-      console.error(`PORT ${envCfg("PORT")} is already in use`);
+      console.error(`PORT ${envLoad("PORT")} is already in use`);
       process.exit(1);
     } else {
       throw err;

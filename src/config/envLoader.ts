@@ -26,6 +26,7 @@ interface EnvConfig {
   TRUST_PROXY: boolean;
   ENCRYPTION_SECRET: string;
   DEBUG_MODE: boolean;
+  DOMAIN: string;
 }
 
 const envConfigTyped: EnvConfig = {
@@ -68,6 +69,7 @@ const envConfigTyped: EnvConfig = {
     "ENCRYPTION_SECRET"
   ),
   DEBUG_MODE: parseBooleanEnv(process.env.DEBUG_MODE, "DEBUG_MODE"),
+  DOMAIN: getRequiredString(process.env.DOMAIN, "DOMAIN"),
 };
 
 function getRequiredString(value: string | undefined, key: string): string {
