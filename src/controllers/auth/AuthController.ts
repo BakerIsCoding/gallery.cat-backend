@@ -1,6 +1,13 @@
 import { AuthService } from "@services/auth/AuthService";
 import { JwtPayload, UserRole, ValidateUserResult } from "@interfaces/auth";
-import { JsonController, Post, Body, HttpCode } from "routing-controllers";
+import {
+  JsonController,
+  Post,
+  Body,
+  HttpCode,
+  Param,
+  QueryParam,
+} from "routing-controllers";
 import { OpenAPI, ResponseSchema } from "routing-controllers-openapi";
 import { LoginResponseDto } from "src/dto/auth/LoginResponseDto";
 import { LoginBodyDto } from "src/dto/auth/LoginBodyDto";
@@ -12,6 +19,7 @@ import EncriptionUtils from "@utils/EncryptionUtils";
 import gallery_users from "@models/gallery_users_model";
 import { RegisterResponseDto } from "src/dto/auth/RegisterResponseDto";
 import { RegisterBodyDto } from "src/dto/auth/RegisterBodyDto";
+import { VerificationResponseDto } from "src/dto/auth/VerificationResponseDto";
 
 @Service()
 @JsonController("/v1/auth")
@@ -53,14 +61,15 @@ export class AuthController {
       };
     }
 
-    const user = await this.validateUser(email, password);
+    const user = await this.authService.validateUser(email, password);
     if (!user.success) {
       return {
         type: ResponseType.ERROR,
         msg: "Invalid credentials",
-        code: 50002,
+        code: user.code,
       };
     }
+
     const encryptionUtils = EncriptionUtils.getInstance();
     const encryptedUserId = encryptionUtils.jwtEncryptValue(user.id.toString());
     const encryptedRoleId = encryptionUtils.jwtEncryptValue(
@@ -165,46 +174,50 @@ export class AuthController {
   }
   */
 
-  private async validateUser(
-    email: string,
-    password: string
-  ): Promise<ValidateUserResult> {
-    const obtainedUser = await gallery_users.findOne({ where: { email } });
-
-    if (!obtainedUser) {
-      return { success: false, message: "User not found" };
+  @Post("/verify")
+  @HttpCode(200)
+  @OpenAPI({
+    summary: "Verify Mail",
+    description: "Verifies a user's email using a token",
+    security: [],
+    parameters: [
+      {
+        name: "token",
+        in: "query",
+        required: true,
+        schema: { type: "string" },
+        description: "Verification token sent to the user's email",
+      },
+    ],
+  })
+  @ResponseSchema(VerificationResponseDto, { statusCode: 200 })
+  @ResponseSchema(TooManyRequestsResponse, { statusCode: 429 })
+  @ResponseSchema(InternalServerErrorResponse, { statusCode: 500 })
+  public async verify(
+    @QueryParam("token") token: string
+  ): Promise<VerificationResponseDto> {
+    if (!token) {
+      return {
+        type: ResponseType.ERROR,
+        msg: "Verification token is required",
+        code: 50016,
+      };
     }
 
-    const passwordMatches = await this.passwordHashMatches(
-      password,
-      obtainedUser?.getDataValue("password") || ""
-    );
+    const userVerify = await this.authService.verifyUserEmail(token);
 
-    if (!passwordMatches) {
-      return { success: false, message: "Invalid password" };
+    if (!userVerify.success) {
+      return {
+        type: ResponseType.ERROR,
+        msg: userVerify.message,
+        code: userVerify.code,
+      };
     }
 
     return {
-      success: true,
-      id: obtainedUser.getDataValue("userId"),
-      role: obtainedUser.getDataValue("role"),
+      type: ResponseType.SUCCESS,
+      msg: "Mail validated successfully",
+      code: 10002,
     };
-  }
-
-  private async passwordHashMatches(
-    plainPassword: string,
-    hashedPassword: string
-  ) {
-    if (!plainPassword || !hashedPassword) {
-      return false;
-    }
-
-    const encryptionUtils = EncriptionUtils.getInstance();
-    const result = await encryptionUtils.verifyHash(
-      hashedPassword,
-      plainPassword
-    );
-
-    return result;
   }
 }

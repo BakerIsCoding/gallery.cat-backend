@@ -1,11 +1,18 @@
 import jwt from "jsonwebtoken";
 import { jwtConfig } from "@config/jwt";
-import { UserRole, type JwtPayload } from "@interfaces/auth";
+import {
+  UserRole,
+  ValidateUserResult,
+  type JwtPayload,
+} from "@interfaces/auth";
 import { Service } from "typedi";
 import gallery_users from "@models/gallery_users_model";
 import EncriptionUtils from "@utils/EncryptionUtils";
 import AuditService from "@services/audit/AuditService";
 import { AuditTable } from "@interfaces/auditInterfaces";
+import { simpleVerifyTemplate } from "templates/MailVerifyTemplate";
+import { MailService } from "@services/mail/MailService";
+import envLoad from "@config/envLoader";
 
 @Service()
 export class AuthService {
@@ -34,6 +41,55 @@ export class AuthService {
     return jwt.verify(token, secret) as JwtPayload;
   }
     */
+
+  public async validateUser(
+    email: string,
+    password: string
+  ): Promise<ValidateUserResult> {
+    const obtainedUser = await gallery_users.findOne({ where: { email } });
+
+    if (!obtainedUser) {
+      return { success: false, message: "User not found", code: 50014 };
+    }
+
+    const passwordMatches = await this.passwordHashMatches(
+      password,
+      obtainedUser?.getDataValue("password") || ""
+    );
+
+    if (!passwordMatches) {
+      return { success: false, message: "Invalid password", code: 50014 };
+    }
+
+    const isUserMailConfirmed = obtainedUser.getDataValue("isMailConfirmed");
+
+    if (!isUserMailConfirmed) {
+      return { success: false, message: "Email not verified", code: 50015 };
+    }
+
+    return {
+      success: true,
+      id: obtainedUser.getDataValue("userId"),
+      role: obtainedUser.getDataValue("role"),
+    };
+  }
+
+  private async passwordHashMatches(
+    plainPassword: string,
+    hashedPassword: string
+  ) {
+    if (!plainPassword || !hashedPassword) {
+      return false;
+    }
+
+    const encryptionUtils = EncriptionUtils.getInstance();
+    const result = await encryptionUtils.verifyHash(
+      hashedPassword,
+      plainPassword
+    );
+
+    return result;
+  }
 
   public async registerUser(
     username: string,
@@ -95,6 +151,22 @@ export class AuthService {
       return { success: false, message: "Failed to create user", code: 50000 };
     }
 
+    const template = simpleVerifyTemplate({
+      username: escapedUsername,
+      verifyUrl: `https://${envLoad(
+        "DOMAIN"
+      )}/v1/auth/verify?token=${registrationToken}`,
+      expiresIn: "15 minutos",
+    });
+
+    const service = new MailService();
+    service.sendMail(
+      escapedEmail,
+      "Verifica tu correo en Gallery.cat",
+      template.html,
+      template.text
+    );
+
     AuditService.logInsert({
       table: AuditTable.USERS,
       userId: newUser.userId,
@@ -108,6 +180,58 @@ export class AuthService {
       role: newUser.role,
       code: 10000,
     };
+  }
+
+  public async verifyUserEmail(mailToken: string): Promise<{
+    success: boolean;
+    message: string;
+    code: number;
+  }> {
+    try {
+      const user = await gallery_users.findOne({ where: { mailToken } });
+
+      if (!user) {
+        return { success: false, message: "Invalid token", code: 50017 };
+      }
+
+      if (user.getDataValue("isMailConfirmed")) {
+        return {
+          success: false,
+          message: "Email is already verified",
+          code: 50018,
+        };
+      }
+
+      const savedUser = await gallery_users.update(
+        {
+          isMailConfirmed: true,
+        },
+        { where: { mailToken } }
+      );
+
+      if (!savedUser) {
+        return {
+          success: false,
+          message: "Unexpected error while verifying email",
+          code: 50019,
+        };
+      }
+
+      AuditService.logUpdate({
+        table: AuditTable.USERS,
+        userId: user.getDataValue("userId"),
+        oldData: user.toJSON(),
+        newData: { ...user.toJSON(), isMailConfirmed: true },
+      });
+
+      return {
+        success: true,
+        message: "Email verified successfully",
+        code: 10003,
+      };
+    } catch (error) {
+      return { success: false, message: "Error verifying email", code: 50019 };
+    }
   }
 
   private async isPasswordValid(password: string): Promise<boolean> {

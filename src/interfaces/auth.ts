@@ -21,6 +21,7 @@ export type ValidateUserOK = {
 export type ValidateUserKO = {
   success: false;
   message: string;
+  code: number;
 };
 
 export type ValidateUserResult = ValidateUserOK | ValidateUserKO;
