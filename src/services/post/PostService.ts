@@ -69,7 +69,7 @@ export class PostService {
       return { items, count, code: 10011 };
     } catch (error) {
       //TODO: LOG ERROR
-      return { items: [], count: 0, code: 50021 };
+      return { items: [], count: 0, code: 50100 };
     }
   }
 
@@ -88,7 +88,7 @@ export class PostService {
       if (!post) {
         return {
           responsePost: null,
-          code: 50021,
+          code: 50100,
         };
       }
 
@@ -118,7 +118,7 @@ export class PostService {
       return { responsePost, code: 10000 };
     } catch (error) {
       //TODO: LOG ERROR
-      return { responsePost: null, code: 50021 };
+      return { responsePost: null, code: 50100 };
     }
   }
 
@@ -132,7 +132,7 @@ export class PostService {
       const userId = Number(decryptedUserId);
 
       if (!userId || Number.isNaN(userId)) {
-        return { success: false, code: 50022 };
+        return { success: false, code: 50101 };
       }
 
       const created = await gallery_posts.create({
@@ -144,7 +144,7 @@ export class PostService {
       });
 
       if (!created) {
-        return { success: false, code: 50022 };
+        return { success: false, code: 50101 };
       }
 
       AuditService.logInsert({
@@ -157,7 +157,7 @@ export class PostService {
     } catch (error) {
       //TODO: LOG ERROR
       console.error("Error creating post (service):", error);
-      return { success: false, code: 50022 };
+      return { success: false, code: 50101 };
     }
   }
 
@@ -171,17 +171,17 @@ export class PostService {
       const userId = Number(decryptedUserId);
 
       if (!userId || Number.isNaN(userId)) {
-        return { success: false, code: 50023 };
+        return { success: false, code: 50102 };
       }
 
       const post = await gallery_posts.findByPk(postId);
 
       if (!post) {
-        return { success: false, code: 50023 };
+        return { success: false, code: 50102 };
       }
 
       if (post.userId !== userId) {
-        return { success: false, code: 50025 };
+        return { success: false, code: 50104 };
       }
 
       await post.destroy();
@@ -196,7 +196,7 @@ export class PostService {
     } catch (error) {
       //TODO: LOG ERROR
       console.error("Error deleting post (service):", error);
-      return { success: false, code: 50023 };
+      return { success: false, code: 50102 };
     }
   }
 }

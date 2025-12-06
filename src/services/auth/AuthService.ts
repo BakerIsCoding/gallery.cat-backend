@@ -1,6 +1,10 @@
 import jwt from "jsonwebtoken";
 import { jwtConfig } from "@config/jwt";
-import { UserRole, type JwtPayload } from "@interfaces/auth";
+import {
+  UserRole,
+  ValidateUserResult,
+  type JwtPayload,
+} from "@interfaces/auth";
 import { Service } from "typedi";
 import gallery_users from "@models/gallery_users_model";
 import EncriptionUtils from "@utils/EncryptionUtils";
@@ -37,6 +41,55 @@ export class AuthService {
     return jwt.verify(token, secret) as JwtPayload;
   }
     */
+
+  public async validateUser(
+    email: string,
+    password: string
+  ): Promise<ValidateUserResult> {
+    const obtainedUser = await gallery_users.findOne({ where: { email } });
+
+    if (!obtainedUser) {
+      return { success: false, message: "User not found", code: 50014 };
+    }
+
+    const passwordMatches = await this.passwordHashMatches(
+      password,
+      obtainedUser?.getDataValue("password") || ""
+    );
+
+    if (!passwordMatches) {
+      return { success: false, message: "Invalid password", code: 50014 };
+    }
+
+    const isUserMailConfirmed = obtainedUser.getDataValue("isMailConfirmed");
+
+    if (!isUserMailConfirmed) {
+      return { success: false, message: "Email not verified", code: 50015 };
+    }
+
+    return {
+      success: true,
+      id: obtainedUser.getDataValue("userId"),
+      role: obtainedUser.getDataValue("role"),
+    };
+  }
+
+  private async passwordHashMatches(
+    plainPassword: string,
+    hashedPassword: string
+  ) {
+    if (!plainPassword || !hashedPassword) {
+      return false;
+    }
+
+    const encryptionUtils = EncriptionUtils.getInstance();
+    const result = await encryptionUtils.verifyHash(
+      hashedPassword,
+      plainPassword
+    );
+
+    return result;
+  }
 
   public async registerUser(
     username: string,
@@ -138,14 +191,14 @@ export class AuthService {
       const user = await gallery_users.findOne({ where: { mailToken } });
 
       if (!user) {
-        return { success: false, message: "Invalid token", code: 500 };
+        return { success: false, message: "Invalid token", code: 50017 };
       }
 
       if (user.getDataValue("isMailConfirmed")) {
         return {
           success: false,
           message: "Email is already verified",
-          code: 500,
+          code: 50018,
         };
       }
 
@@ -157,7 +210,11 @@ export class AuthService {
       );
 
       if (!savedUser) {
-        return { success: false, message: "Error verifying email", code: 500 };
+        return {
+          success: false,
+          message: "Unexpected error while verifying email",
+          code: 50019,
+        };
       }
 
       AuditService.logUpdate({
@@ -170,10 +227,10 @@ export class AuthService {
       return {
         success: true,
         message: "Email verified successfully",
-        code: 10000,
+        code: 10003,
       };
     } catch (error) {
-      return { success: false, message: "Error verifying email", code: 500 };
+      return { success: false, message: "Error verifying email", code: 50019 };
     }
   }
 

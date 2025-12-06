@@ -14,6 +14,11 @@
     "en": "Register successful",
     "ca": ""
   },
+  "10003": {
+    "es": "",
+    "en": "Email verified successfully",
+    "ca": ""
+  },
   "10011": {
     "es": "",
     "en": "Posts retrieved successfully",
@@ -99,27 +104,57 @@
     "en": "Email is already registered",
     "ca": ""
   },
-  "50021": {
+  "50014": {
+    "es": "",
+    "en": "The mail or password are incorrect",
+    "ca": ""
+  },
+  "50015": {
+    "es": "",
+    "en": "The mail has not been verified",
+    "ca": ""
+  },
+  "50016": {
+    "es": "",
+    "en": "Verification token is required",
+    "ca": ""
+  },
+  "50017": {
+    "es": "",
+    "en": "Invalid token",
+    "ca": ""
+  },
+  "50018": {
+    "es": "",
+    "en": "Email is already verified",
+    "ca": ""
+  },
+  "50019": {
+    "es": "",
+    "en": "Unexpected error while verifying email",
+    "ca": ""
+  },
+  "50100": {
     "es": "",
     "en": "Error retrieving posts",
     "ca": ""
   },
-  "50022": {
+  "50101": {
     "es": "",
     "en": "Error creating post",
     "ca": ""
   },
-  "50023": {
+  "50102": {
     "es": "",
     "en": "Error deleting post",
     "ca": ""
   },
-  "50024": {
+  "50103": {
     "es": "",
     "en": "You are not authorized to edit this post",
     "ca": ""
   },
-  "50025": {
+  "50104": {
     "es": "",
     "en": "You are not authorized to delete this post",
     "ca": ""

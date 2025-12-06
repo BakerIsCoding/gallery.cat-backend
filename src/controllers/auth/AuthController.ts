@@ -19,6 +19,7 @@ import EncriptionUtils from "@utils/EncryptionUtils";
 import gallery_users from "@models/gallery_users_model";
 import { RegisterResponseDto } from "src/dto/auth/RegisterResponseDto";
 import { RegisterBodyDto } from "src/dto/auth/RegisterBodyDto";
+import { VerificationResponseDto } from "src/dto/auth/VerificationResponseDto";
 
 @Service()
 @JsonController("/v1/auth")
@@ -60,14 +61,15 @@ export class AuthController {
       };
     }
 
-    const user = await this.validateUser(email, password);
+    const user = await this.authService.validateUser(email, password);
     if (!user.success) {
       return {
         type: ResponseType.ERROR,
         msg: "Invalid credentials",
-        code: 50002,
+        code: user.code,
       };
     }
+
     const encryptionUtils = EncriptionUtils.getInstance();
     const encryptedUserId = encryptionUtils.jwtEncryptValue(user.id.toString());
     const encryptedRoleId = encryptionUtils.jwtEncryptValue(
@@ -172,49 +174,6 @@ export class AuthController {
   }
   */
 
-  private async validateUser(
-    email: string,
-    password: string
-  ): Promise<ValidateUserResult> {
-    const obtainedUser = await gallery_users.findOne({ where: { email } });
-
-    if (!obtainedUser) {
-      return { success: false, message: "User not found" };
-    }
-
-    const passwordMatches = await this.passwordHashMatches(
-      password,
-      obtainedUser?.getDataValue("password") || ""
-    );
-
-    if (!passwordMatches) {
-      return { success: false, message: "Invalid password" };
-    }
-
-    return {
-      success: true,
-      id: obtainedUser.getDataValue("userId"),
-      role: obtainedUser.getDataValue("role"),
-    };
-  }
-
-  private async passwordHashMatches(
-    plainPassword: string,
-    hashedPassword: string
-  ) {
-    if (!plainPassword || !hashedPassword) {
-      return false;
-    }
-
-    const encryptionUtils = EncriptionUtils.getInstance();
-    const result = await encryptionUtils.verifyHash(
-      hashedPassword,
-      plainPassword
-    );
-
-    return result;
-  }
-
   @Post("/verify")
   @HttpCode(200)
   @OpenAPI({
@@ -231,17 +190,17 @@ export class AuthController {
       },
     ],
   })
-  @ResponseSchema(RegisterResponseDto, { statusCode: 200 })
+  @ResponseSchema(VerificationResponseDto, { statusCode: 200 })
   @ResponseSchema(TooManyRequestsResponse, { statusCode: 429 })
   @ResponseSchema(InternalServerErrorResponse, { statusCode: 500 })
   public async verify(
     @QueryParam("token") token: string
-  ): Promise<RegisterResponseDto> {
+  ): Promise<VerificationResponseDto> {
     if (!token) {
       return {
         type: ResponseType.ERROR,
         msg: "Verification token is required",
-        code: 500,
+        code: 50016,
       };
     }
 

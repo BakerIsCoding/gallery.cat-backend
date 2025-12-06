@@ -59,6 +59,7 @@
     "date-fns-tz": "^3.2.0",
     "es-toolkit": "^1.32.0",
     "fs": "^0.0.1-security",
+    "gallery.cat-backend": "file:",
     "http": "^0.0.1-security",
     "jsonwebtoken": "^9.0.2",
     "module-alias": "^2.2.3",
