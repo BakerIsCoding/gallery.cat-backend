@@ -23,6 +23,7 @@ import { PostsController } from "@controllers/post/PostController";
 import { UserRole } from "@interfaces/auth";
 import { AuthMiddleware } from "src/middlewares/AuthMiddleware";
 import envLoad from "@config/envLoader";
+import { CommentsController } from "@controllers/post/comment/CommentController";
 
 const app: Express = express();
 
@@ -75,7 +76,7 @@ const currentUserChecker = async (action: Action) => {
 };
 
 useExpressServer(app, {
-  controllers: [AuthController, PostsController],
+  controllers: [AuthController, PostsController, CommentsController],
   validation: true,
   classTransformer: true,
   defaultErrorHandler: false,
@@ -93,7 +94,7 @@ const storage = getMetadataArgsStorage();
 const swaggerSpec = routingControllersToSpec(
   storage,
   {
-    controllers: [AuthController, PostsController],
+    controllers: [AuthController, PostsController, CommentsController],
     routePrefix: "",
   },
   {

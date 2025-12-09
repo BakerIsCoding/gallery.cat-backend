@@ -1,5 +1,6 @@
 import envCfg from "@config/envLoader";
 import EncriptionUtils from "./EncryptionUtils";
+import gallery_users from "@models/gallery_users_model";
 
 export function getUserIdFromRequest(req: any): number {
   if (!req || !req.user) {
@@ -41,4 +42,22 @@ export function getUserRoleFromRequest(req: any): number | null {
   }
 
   return Number(req.user.role);
+}
+
+export async function isUserExistingById(
+  userId: number | null
+): Promise<boolean> {
+  if (!userId) {
+    return false;
+  }
+
+  const obtainedUser = await gallery_users.findOne({
+    where: { userId: userId },
+  });
+
+  if (!obtainedUser) {
+    return false;
+  }
+
+  return true;
 }
