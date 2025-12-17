@@ -1,4 +1,3 @@
-// src/controllers/CommentsController.ts
 import {
   JsonController,
   Post,
@@ -11,6 +10,7 @@ import {
   CurrentUser,
   HttpCode,
   QueryParam,
+  UseBefore,
 } from "routing-controllers";
 import { OpenAPI, ResponseSchema } from "routing-controllers-openapi";
 import { Service } from "typedi";
@@ -33,6 +33,9 @@ import { isUserExistingById } from "@utils/UserUtils";
 import AuditService from "@services/audit/AuditService";
 import { AuditTable } from "@interfaces/auditInterfaces";
 import { CommentsService } from "@services/post/comment/CommentService";
+import { AuthMiddleware } from "src/middlewares/AuthMiddleware";
+import { AuthService } from "@services/auth/AuthService";
+const auth = new AuthMiddleware(new AuthService()).authenticate;
 
 @Service()
 @JsonController("/v1")
@@ -94,7 +97,7 @@ export class CommentsController {
   }
 
   @Post("/posts/:postId/comments")
-  @Authorized()
+  @UseBefore(auth)
   @HttpCode(200)
   @OpenAPI({
     summary: "Create comment",
@@ -146,7 +149,7 @@ export class CommentsController {
   }
 
   @Put("/comments/:commentId")
-  @Authorized()
+  @UseBefore(auth)
   @HttpCode(200)
   @OpenAPI({
     summary: "Update comment",
@@ -184,7 +187,6 @@ export class CommentsController {
     code: number;
   }> {
     try {
-      // TODO: Only possible to edit the comment one time
       const commentsService = new CommentsService();
 
       if (!commentId || Number.isNaN(commentId)) {
@@ -218,7 +220,7 @@ export class CommentsController {
   }
 
   @Delete("/comments/:commentId")
-  @Authorized()
+  @UseBefore(auth)
   @HttpCode(200)
   @OpenAPI({
     summary: "Delete comment",

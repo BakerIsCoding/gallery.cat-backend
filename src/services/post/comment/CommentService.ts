@@ -222,10 +222,24 @@ export class CommentsService {
       });
 
       if (!comment) {
+        // The comment does not exist
         return {
           type: ResponseType.ERROR,
           updatedComment: null,
           code: 50207,
+        };
+      }
+
+      // Prevent editing if the comment has been created more than 15 minutes ago
+      const FIFTEEN_MINUTES_MS = 15 * 60 * 1000;
+      const createdAt = new Date(comment.createdAt).getTime();
+      const now = Date.now();
+
+      if (now - createdAt > FIFTEEN_MINUTES_MS) {
+        return {
+          type: ResponseType.ERROR,
+          updatedComment: null,
+          code: 50210,
         };
       }
 
