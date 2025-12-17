@@ -238,5 +238,10 @@
     "es": "",
     "en": "You are not allowed to edit this comment, the time window has expired",
     "ca": ""
+  },
+  "50213": {
+    "es": "",
+    "en": "This comment is already deleted",
+    "ca": ""
   }
 }

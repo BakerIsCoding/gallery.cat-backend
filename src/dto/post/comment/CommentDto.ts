@@ -19,9 +19,6 @@ export class CommentDto {
   @IsNumber()
   postId!: number;
 
-  @IsNumber()
-  userId!: number;
-
   @IsString()
   content!: string | null;
 

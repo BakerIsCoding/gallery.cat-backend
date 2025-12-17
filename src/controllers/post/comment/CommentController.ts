@@ -200,7 +200,11 @@ export class CommentsController {
       const result = await commentsService.updateComment(user, commentId, body);
 
       if (result.type === ResponseType.ERROR || !result.updatedComment) {
-        throw new Error("Error updating comment");
+        return {
+          type: result.type,
+          msg: "Error updating comment",
+          code: result.code,
+        };
       }
 
       return {
@@ -256,6 +260,15 @@ export class CommentsController {
 
       const commentsService = new CommentsService();
       const result = await commentsService.deleteComment(user, commentId);
+
+      if (result.type === ResponseType.ERROR) {
+        return {
+          type: result.type,
+          msg: "Error deleting comment",
+          data: { deleted: false },
+          code: result.code,
+        };
+      }
 
       return {
         type: result.type,

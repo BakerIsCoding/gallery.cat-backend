@@ -1,9 +1,10 @@
-import { IsNumber, ValidateIf, ValidateNested } from "class-validator";
+import { IsArray, IsNumber, ValidateIf, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
-import { BaseResponseDto } from "../common/BaseResponseDto";
+import { BaseResponseDto, ResponseType } from "../common/BaseResponseDto";
 import { PostDto } from "./PostDto";
 
 class PostListDataDto {
+  @IsArray()
   @ValidateNested({ each: true })
   @Type(() => PostDto)
   items!: PostDto[];
@@ -19,7 +20,7 @@ class PostListDataDto {
 }
 
 export class PostListResponseDto extends BaseResponseDto {
-  @ValidateIf((response) => response.type === "success")
+  @ValidateIf((r) => r.type === ResponseType.SUCCESS)
   @ValidateNested()
   @Type(() => PostListDataDto)
   data?: PostListDataDto;

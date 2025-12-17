@@ -51,7 +51,6 @@ export class CommentsService {
         items.push({
           commentId: comment.commentId,
           postId: comment.postId,
-          userId: comment.userId,
           content: commentContent,
           parentCommentId: comment.parentCommentId ?? null,
           isDeleted: comment.isDeleted,
@@ -107,7 +106,6 @@ export class CommentsService {
       };
     }
 
-    let parentCommentId: number | undefined;
     let createdComment: any;
 
     if (body.parentCommentId === null || body.parentCommentId === undefined) {
@@ -124,7 +122,7 @@ export class CommentsService {
     } else {
       // Verify that the parent comment in that post exists
       const isCommentExisting = await gallery_post_comments.findOne({
-        where: { parentCommentId: body.parentCommentId, postId: postId },
+        where: { commentId: body.parentCommentId, postId: postId },
       });
 
       if (!isCommentExisting) {
@@ -139,7 +137,7 @@ export class CommentsService {
         postId,
         userId,
         content: body.content,
-        parentCommentId: parentCommentId ?? null,
+        parentCommentId: body.parentCommentId ?? null,
         isDeleted: false,
         createdAt: new Date(),
         updatedAt: null,
@@ -172,7 +170,6 @@ export class CommentsService {
     const responseComment: CommentDto = {
       commentId: comment.commentId,
       postId: comment.postId,
-      userId: comment.userId,
       content: comment.content,
       parentCommentId: comment.parentCommentId ?? null,
       isDeleted: comment.isDeleted,
@@ -210,6 +207,7 @@ export class CommentsService {
       const userId = Number(decryptedUserId);
 
       if (!userId || Number.isNaN(userId)) {
+        // Invalid user id
         return {
           type: ResponseType.ERROR,
           updatedComment: null,
@@ -217,7 +215,8 @@ export class CommentsService {
         };
       }
 
-      const comment = await gallery_post_comments.findByPk(commentId, {
+      const comment = await gallery_post_comments.findOne({
+        where: { commentId: commentId },
         include: [{ model: gallery_users, as: "user" }],
       });
 
@@ -253,6 +252,7 @@ export class CommentsService {
       }
 
       const oldData = comment.toJSON();
+      delete (oldData as any).user;
 
       if (typeof body.content === "string") {
         comment.content = body.content;
@@ -262,11 +262,14 @@ export class CommentsService {
 
       await comment.save();
 
+      const newData = comment.toJSON();
+      delete (newData as any).user;
+
       AuditService.logUpdate({
         table: AuditTable.POST_COMMENTS,
         userId: userId,
-        oldData: oldData,
-        newData: comment.toJSON(),
+        oldData,
+        newData,
       });
 
       const author = comment.user;
@@ -274,7 +277,6 @@ export class CommentsService {
       const responseComment: CommentDto = {
         commentId: comment.commentId,
         postId: comment.postId,
-        userId: comment.userId,
         content: comment.content,
         parentCommentId: comment.parentCommentId ?? null,
         isDeleted: comment.isDeleted,
@@ -288,7 +290,7 @@ export class CommentsService {
       };
 
       return {
-        type: ResponseType.ERROR,
+        type: ResponseType.SUCCESS,
         updatedComment: responseComment,
         code: 10052,
       };
@@ -331,7 +333,17 @@ export class CommentsService {
         };
       }
 
+      if (comment.isDeleted) {
+        // Comment is already deleted
+        return {
+          type: ResponseType.ERROR,
+          data: { deleted: false },
+          code: 50213,
+        };
+      }
+
       const oldData = comment.toJSON();
+      delete (oldData as any).user;
 
       if (comment.userId !== userId) {
         // User is not the author of the comment
@@ -347,11 +359,14 @@ export class CommentsService {
 
       await comment.save();
 
+      const newData = comment.toJSON();
+      delete (newData as any).user;
+
       AuditService.logUpdate({
         table: AuditTable.POST_COMMENTS,
         userId: userId,
-        oldData: oldData,
-        newData: comment.toJSON(),
+        oldData,
+        newData,
       });
 
       // Comment successfully soft deleted

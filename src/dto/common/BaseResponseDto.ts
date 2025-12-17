@@ -13,7 +13,5 @@ export class BaseResponseDto {
   msg!: string;
 
   @IsNumber()
-  @Min(10000)
-  @Max(99999)
   code!: number;
 }
