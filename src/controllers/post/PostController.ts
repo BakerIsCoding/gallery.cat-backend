@@ -68,10 +68,10 @@ export class PostsController {
     try {
       const allPosts = await this.postService.getAllPostsByPage(page, pageSize);
 
-      if (allPosts.code) {
+      if (allPosts.count === 0) {
         return {
           type: ResponseType.ERROR,
-          msg: "Error retrieving posts",
+          msg: "No posts found",
           code: allPosts.code,
         };
       }
@@ -120,7 +120,7 @@ export class PostsController {
     try {
       const responsePost = await this.postService.getPostById(postId);
 
-      if (responsePost.code || !responsePost.responsePost) {
+      if (!responsePost.responsePost) {
         return {
           type: ResponseType.ERROR,
           msg: "Post not found",

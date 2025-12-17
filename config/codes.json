@@ -34,6 +34,16 @@
     "en": "Post deleted successfully",
     "ca": ""
   },
+  "10051": {
+    "es": "",
+    "en": "Comment created successfully",
+    "ca": ""
+  },
+  "10052": {
+    "es": "",
+    "en": "Comment updated successfully",
+    "ca": ""
+  },
   "50000": {
     "es": "Ha ocurrido un error",
     "en": "An error has occurred",
@@ -157,6 +167,81 @@
   "50104": {
     "es": "",
     "en": "You are not authorized to delete this post",
+    "ca": ""
+  },
+  "50105": {
+    "es": "",
+    "en": "This post does not exist",
+    "ca": ""
+  },
+  "50200": {
+    "es": "",
+    "en": "User does not exist",
+    "ca": ""
+  },
+  "50201": {
+    "es": "",
+    "en": "Invalid parent comment",
+    "ca": ""
+  },
+  "50202": {
+    "es": "",
+    "en": "The comment has been created but could not be loaded",
+    "ca": ""
+  },
+  "50203": {
+    "es": "",
+    "en": "Something went wrong while creating the comment",
+    "ca": ""
+  },
+  "50204": {
+    "es": "",
+    "en": "Something went wrong while recovering the comments",
+    "ca": ""
+  },
+  "50205": {
+    "es": "",
+    "en": "Invalid commentId",
+    "ca": ""
+  },
+  "50206": {
+    "es": "",
+    "en": "Invalid userId",
+    "ca": ""
+  },
+  "50207": {
+    "es": "",
+    "en": "Comment not found",
+    "ca": ""
+  },
+  "50208": {
+    "es": "",
+    "en": "You are not allowed to edit this comment",
+    "ca": ""
+  },
+  "50209": {
+    "es": "",
+    "en": "Something went wrong while updating the comment",
+    "ca": ""
+  },
+  "50210": {
+    "es": "",
+    "en": "Something went wrong while deleting the comment",
+    "ca": ""
+  },
+  "50211": {
+    "es": "",
+    "en": "You are not allowed to delete this comment",
+    "ca": ""
+  },
+  "50212": {
+    "es": "",
+    "en": "You are not allowed to edit this comment, the time window has expired",
+    "ca": ""
+  },
+  "50213": {
+    "es": "",
+    "en": "This comment is already deleted",
     "ca": ""
   }
 }
